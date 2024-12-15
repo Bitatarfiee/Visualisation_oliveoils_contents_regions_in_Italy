@@ -1,0 +1,224 @@
+---
+title: "Visualization - Olive oil contents based on different region in Italy"
+author: "Bita tarfiee"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE
+)
+```
+
+```{css, echo=FALSE}
+hr {
+  border: 1px solid black; /* Adjust the thickness and color as needed */
+}
+```
+
+### Description
+We work with olive data set that contains information about contents of olive oils coming from different regions in Italy. 
+
+### Part 1
+At first we create a scatterplot in Ggplot2 that shows dependence of Palmitic on Oleic in which observations are colored by Linoleic. In addition, we create a similar scatter plot in which we divide Linoleic variable into fours classes (use cut_interval()) and map the discretized variable to 
+color instead. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+
+## Assignment1: Perception in Visualization
+# Part 1
+Olive_data <- read.csv("olive.csv", row.names=1)
+#colnames(Olive_data)
+
+p=ggplot(data = Olive_data)+ aes(x = oleic , y =  palmitic, color = linoleic) +
+  geom_point() +
+  labs(x = "Oleic", y = "Palmitic", title = "Scatterplot: Palmitic vs. Oleic (Colored by Linoleic)")
+p
+
+
+# Dividing Linoleic variable into fours classes
+Olive_data$Linoleic_class <- cut_interval(Olive_data$linoleic, n = 4)
+#Olive_data$Linoleic_class <- as.numeric(Olive_data$Linoleic_class)
+
+ggplot(data = Olive_data)+ aes(x = oleic , y =  palmitic, color =Linoleic_class ) +
+  geom_point() +
+  labs(x = "Oleic", y = "Palmitic", title = "Scatterplot: Palmitic vs. Oleic (Colored by Discretized Linoleic)")
+
+```
+
+
+Here in these plots, observations are colored by Linoleic. In the first plot distinguishing between different numbers is hard because we use color saturation. 
+In the second plot, we use the 4 distinct numbers of colors so they can perceive by humans more easily. 
+
+
+---
+
+Then we create scatterplots of Palmitic vs Oleic in which we map the discretized Linoleic with four classes to:
+a. Color
+b. Size
+c. Orientation angle (use geom_spoke())
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# Part 2 
+# a: Create a scatterplot with discretized Linoleic mapped to color
+ggplot(data =Olive_data, aes(x = oleic ,y =  palmitic, color = Linoleic_class)) +
+  geom_point() +
+  labs(x = "Oleic", y = "Palmitic", title = "Scatterplot: Palmitic vs. Oleic (Colored by Discretized Linoleic)")
+
+
+# b: Create a scatterplot with discretized Linoleic mapped to size
+ggplot(data =Olive_data, aes(x = oleic ,y =  palmitic, size = as.numeric(Linoleic_class)))+
+  geom_point() +
+  labs(x = "Oleic", y = "Palmitic", title = "Scatterplot: Palmitic vs. Oleic (Sized by Discretized Linoleic)")
+
+
+
+# c: Create a scatterplot with discretized Linoleic mapped to orientation angle
+ggplot(data =Olive_data, aes(x = oleic ,y =  palmitic, angle =as.numeric( Linoleic_class)))+
+  geom_spoke(aes(radius = 0.1), size = 5) +
+  labs(x = "Oleic", y = "Palmitic", title = "Scatterplot: Palmitic vs. Oleic (Orientation by Discretized Linoleic)")
+
+```
+
+---
+
+
+Creating a scatterplot of Oleic vs Eicosenoic in which color is defined by numeric values of Region. Then we create a similar kind of plot in which Region is a categorical variable
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Part 3
+# Create a scatterplot of Oleic vs Eicosenoic in which color is defined by numeric values of Region.
+
+p1 = ggplot(data = Olive_data, aes(x = oleic , y =  eicosenoic, color = as.numeric(Region))) +
+  geom_point() +
+  labs(x = "Oleic", y = "Eicosenoic", title = "Scatterplot: Eicosenoic vs. Oleic (Colored by Region)")
+p1
+
+
+#scatterplot of Oleic vs Eicosenoic in which color is defined by categorical values of Region.
+
+p2 = ggplot(data = Olive_data, aes(x = oleic , y =  eicosenoic, color = as.factor(Region))) +
+  geom_point() +
+  labs(x = "Oleic", y = "Eicosenoic", title = "Scatterplot: Eicosenoic vs. Oleic (Colored by Region)")
+p2
+
+```
+
+
+
+---
+
+
+In this part we create a scatterplot of Oleic vs Eicosenoic in which color is defined by a discretized Linoleic (3 classes), shape is defined by a discretized Palmitic (3 classes) and size is defined by a discretized Palmitoleic (3 classes). 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# Part 4
+Olive_data$Linoleic_class <- cut_interval(Olive_data$linoleic, n = 3)
+Olive_data$Linoleic_class <- as.numeric(Olive_data$Linoleic_class)
+
+
+Olive_data$Palmitic_class <- cut_interval(Olive_data$palmitic, n = 3)
+Olive_data$Palmitic_class <- as.factor(Olive_data$Palmitic_class)
+
+
+Olive_data$Palmitoleic_class <- cut_interval(Olive_data$palmitoleic, n = 3)
+Olive_data$Palmitoleic_class <- as.numeric(Olive_data$Palmitoleic_class)
+
+
+ggplot(data=Olive_data, aes(x = oleic ,y =  eicosenoic, color = Linoleic_class, shape = Palmitic_class,
+                             size = Palmitoleic_class)) +
+  geom_point() +
+  labs(x = "Oleic", y = "Palmitic", title = "Scatterplot: Palmitic vs. Oleic (Colored by Discretized Linoleic)")
+
+```
+
+
+---
+
+Create a scatterplot of Oleic vs Eicosenoic in which color is defined by Region, shape is defined by a discretized Palmitic (3 classes) and size is defined by a discretized Palmitoleic (3 classes). 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+#Part5
+
+ggplot(data =Olive_data, aes(x = oleic , y =  eicosenoic, color=factor(Region), 
+                             shape=factor(Palmitic_class), size=Palmitoleic_class)) +
+  geom_point() +
+  labs(x = "Oleic", y = "Palmitic", title = "Scatterplot: Eicosenoic vs. Oleic (Colored by Region)")
+
+```
+
+
+
+Region is a categorical variable so here we can see the distinct color of its map according to Treisman, the first stage of the feature integration theory is the preattentive stage. During this stage, different parts of the brain automatically gather information about basic features (colors, shape, movement) that are found in the visual field. The idea that features are automatically separated appears counter-intuitive.(Wikipedia) Color hue is a Preattentive feature and a Boundary between two groups of elements with the same visual feature is detected preattentively.
+So when we look at the plot brain, first sees the color boundaries between regions.
+
+---
+
+
+Using Plotly to create a pie chart that shows the proportions of oils coming from different Areas. Hide labels in this plot and keep only hover-on labels.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# Part 6
+library(plotly)
+c1 <- Olive_data %>% group_by(Area) %>% summarise(nArea = n())
+c1$nArea <- c1$nArea / sum(c1$nArea)*100
+p3 <- plot_ly(c1, labels =~Area, values =~nArea, textinfo=~"none")%>%
+  add_pie
+
+p3
+
+```
+
+
+
+
+---
+
+
+Finally, we create a 2d-density contour plot with Ggplot2 in which you show dependence of Linoleic vs Eicosenoic. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# Part 7
+library(ggplot2)
+p4 <- ggplot(data = Olive_data, aes(x = eicosenoic , y =  linolenic)) +
+  geom_density_2d_filled() +
+  labs(x = "Eicosenoic", y = "Linolenic", title = "2d-density contour plot: Linolenic vs. Eicosenoic")
+p4
+
+
+# Scatter plot using the  dependence of Linoleic vs Eicosenoic 
+library(ggplot2)
+p5 <- ggplot(data = Olive_data, aes(x = eicosenoic , y =  linolenic)) +
+  geom_point(color = "darkblue") +
+  labs(x = "Eicosenoic", y = "Linolenic", title = "scatterplot: Linolenic vs. Eicosenoic")
+p5
+
+```
+
+The contour plot can me misleading because:
+
+Contour lines can sometimes create shapes that might be misinterpreted. For example, a single cluster of data points can appear as multiple separate regions due to the contour lines' shape.
+
+
+The contour plot presents a smoothed representation of the data, which can hide important details, such as clusters or gaps in the data. It may give the impression of continuous data even if the underlying data points are discrete.
+
+But the scatterplot allows us to see individual data points and their precise locations, providing a more detailed and accurate representation of the data.
+
+---
+
+### Apendix
+```{r eval=FALSE, echo=TRUE, message=FALSE, warning=FALSE, ref.label=knitr::all_labels()}
+```
+
